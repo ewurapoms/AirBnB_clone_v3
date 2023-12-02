@@ -4,6 +4,7 @@ Module for the place_amenities objects
 that handles all default RESTFul API actions
 """
 from flask import jsonify, request, abort
+from flask import make_response
 from api.v1.views import app_views
 from models import storage
 from models.place import Place
