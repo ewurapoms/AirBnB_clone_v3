@@ -3,8 +3,7 @@
 Module for the Places objects
 that handles all default RESTFul API actions
 """
-
-from flask import jsonify, request, abort
+from flask import jsonify, request, abort, make_response
 from api.v1.views import app_views
 from models import storage
 from models.city import City
@@ -39,7 +38,7 @@ def delete_place(place_id):
         abort(404)
     place.delete()
     storage.save()
-    return jsonify({}), 200
+    return make_response(jsonify({}), 200)
 
 
 @app_views.route('/cities/<city_id>/places', methods=['POST'],
@@ -63,7 +62,7 @@ def create_place(city_id):
     setattr(place, 'city_id', city_id)
     storage.new(place)
     storage.save()
-    return jsonify(place.to_dict()), 201
+    return make_response(jsonify(place.to_dict()), 201)
 
 
 @app_views.route('/places/<place_id>', methods=['PUT'],
@@ -77,8 +76,9 @@ def update_place(place_id):
     if not data:
         abort(400, 'Not a JSON')
 
+    # Update the State object's attributes based on the JSON data
     for key, value in data.items():
         if key not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
             setattr(place, key, value)
     storage.save()
-    return jsonify(place.to_dict()), 200
+    return make_response(jsonify(place.to_dict()), 200)
