@@ -5,7 +5,7 @@ blueprint registration and handles errors
 """
 
 from api.v1.views import app_views
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from models import storage
 import os
