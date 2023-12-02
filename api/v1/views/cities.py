@@ -3,8 +3,7 @@
 Module for the City objects
 that handles all default RESTFul API actions
 """
-
-from flask import jsonify, request
+from flask import jsonify, request, abort
 from api.v1.views import app_views
 from models import storage
 from models.state import State
@@ -13,18 +12,19 @@ from models.city import City
 
 @app_views.route('/states/<state_id>/cities', methods=['GET'],
                  strict_slashes=False)
-def get_city_state(state_id):
+def get_city_by_state(state_id):
     """Retrieves the list of all City objects of a State"""
     state = storage.get("State", state_id)
     if not state:
         abort(404)
-         return jsonify([city.to_dict() for city in state.cities])
+    return jsonify([city.to_dict() for city in state.cities])
+
 
 @app_views.route('/cities/<city_id>', methods=['GET'], strict_slashes=False)
 def get_city(city_id):
     """Retrieves a City object by ID"""
     city = storage.get("City", city_id)
-    if not city:
+    if city is None:
         abort(404)
     return jsonify(city.to_dict())
 
@@ -34,9 +34,9 @@ def get_city(city_id):
 def delete_city(city_id):
     """Deletes a City object by ID"""
     city = storage.get("City", city_id)
-    if not city:
+    if city is None:
         abort(404)
-    storage.delete(city)
+    city.delete()
     storage.save()
     return jsonify({}), 200
 
@@ -48,12 +48,12 @@ def create_city(state_id):
     state = storage.get('State', state_id)
     if not state:
         abort(404)
-    newCity = request.get_json()
-    if not newCity:
+    new_city = request.get_json()
+    if not new_city:
         abort(400, 'Not a JSON')
-    if 'name' not in newCity:
+    if 'name' not in new_city:
         abort(400, 'Missing name')
-    city = City(**newCity)
+    city = City(**new_city)
     setattr(city, 'state_id', state_id)
     storage.new(city)
     storage.save()
@@ -65,7 +65,7 @@ def create_city(state_id):
 def update_city(city_id):
     """Updates a City object by ID"""
     city = storage.get("City", city_id)
-    if not city:
+    if city is None:
         abort(404)
     data = request.get_json()
     if not data:
