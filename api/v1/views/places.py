@@ -82,7 +82,9 @@ def update_place(place_id):
             setattr(place, key, value)
     storage.save()
     return make_response(jsonify(place.to_dict()), 200)
-    @app_views.route('/places_search', methods=['POST'])
+
+
+@app_views.route('/places_search', methods=['POST'])
 def find_places():
     '''Retrieves a Place object
     '''
