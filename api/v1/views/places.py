@@ -9,6 +9,8 @@ from models import storage
 from models.city import City
 from models.state import State
 from models.place import Place
+from models.user import User
+from models.amenity import Amenity
 
 
 @app_views.route('/cities/<city_id>/places', methods=['GET'],
@@ -96,16 +98,14 @@ def places_search():
     cities_ids = data.get('cities', [])
     amenities_ids = data.get('amenities', [])
 
-    places_results = []
-    all_places = storage.all(Place).values()
-
+    places_results = set()
     if not states_ids and not cities_ids:
-        places_results.extend(all_places)
+        places_results.update(storage.all(Place).values())
     else:
-        for state_id in states_ids:
-            state = storage.get(State, state_id)
+        for state_id in state_ids:
+            state = staorage.get(State, state_id)
             if state:
-                places_results.extend(state.places)
+                places_results.update(state.places)
 
         for city_id in cities_ids:
             city = storage.get(City, city_id)
